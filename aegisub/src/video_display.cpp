@@ -43,6 +43,7 @@
 #include "include/aegisub/hotkey.h"
 #include "include/aegisub/menu.h"
 #include "options.h"
+#include "retina_helper.h"
 #include "spline_curve.h"
 #include "subs_controller.h"
 #include "threaded_frame_source.h"
@@ -126,6 +127,7 @@ VideoDisplay::VideoDisplay(
 	Bind(wxEVT_LEFT_UP, &VideoDisplay::OnMouseEvent, this);
 	Bind(wxEVT_MOTION, &VideoDisplay::OnMouseEvent, this);
 	Bind(wxEVT_MOUSEWHEEL, &VideoDisplay::OnMouseWheel, this);
+	
 
 	SetCursor(wxNullCursor);
 
@@ -152,6 +154,10 @@ bool VideoDisplay::InitContext() {
 		glContext = agi::util::make_unique<wxGLContext>(this);
 
 	SetCurrent(*glContext);
+	
+	retinaHelper = agi::util::make_unique<RetinaHelper>(this);
+	retinaHelper->setViewWantsBestResolutionOpenGLSurface(true);
+	
 	return true;
 }
 
@@ -196,11 +202,13 @@ void VideoDisplay::Render() try {
 	if (videoSize.GetWidth() == 0) videoSize.SetWidth(1);
 	if (videoSize.GetHeight() == 0) videoSize.SetHeight(1);
 
+	scaleFactor = retinaHelper->getBackingScaleFactor();
+
 	if (!viewport_height || !viewport_width)
 		PositionVideo();
 
 	videoOut->Render(viewport_left, viewport_bottom, viewport_width, viewport_height);
-	E(glViewport(0, std::min(viewport_bottom, 0), videoSize.GetWidth(), videoSize.GetHeight()));
+	E(glViewport(0, std::min(viewport_bottom, 0), videoSize.GetWidth() * scaleFactor, videoSize.GetHeight() * scaleFactor));
 
 	E(glMatrixMode(GL_PROJECTION));
 	E(glLoadIdentity());
@@ -279,8 +287,8 @@ void VideoDisplay::PositionVideo() {
 	viewport_left = 0;
 	viewport_bottom = GetClientSize().GetHeight() - videoSize.GetHeight();
 	viewport_top = 0;
-	viewport_width = videoSize.GetWidth();
-	viewport_height = videoSize.GetHeight();
+	viewport_width = videoSize.GetWidth() * scaleFactor;
+	viewport_height = videoSize.GetHeight() * scaleFactor;
 
 	if (freeSize) {
 		int vidW = con->videoController->GetWidth();
@@ -312,9 +320,11 @@ void VideoDisplay::PositionVideo() {
 
 void VideoDisplay::UpdateSize() {
 	if (!con->videoController->IsLoaded() || !IsShownOnScreen()) return;
-
+	
 	videoSize.Set(con->videoController->GetWidth(), con->videoController->GetHeight());
+	
 	videoSize *= zoomValue;
+	
 	if (con->videoController->GetAspectRatioType() != AspectRatio::Default)
 		videoSize.SetWidth(videoSize.GetHeight() * con->videoController->GetAspectRatioValue());
 
@@ -431,6 +441,7 @@ Vector2D VideoDisplay::GetMousePosition() const {
 }
 
 void VideoDisplay::Unload() {
+	retinaHelper.reset();
 	glContext.reset();
 	videoOut.reset();
 	tool.reset();
