@@ -43,8 +43,8 @@
 #include "include/aegisub/hotkey.h"
 #include "include/aegisub/menu.h"
 #include "options.h"
-#include "retina_helper.h"
 #include "spline_curve.h"
+#include "retina_helper.h"
 #include "subs_controller.h"
 #include "threaded_frame_source.h"
 #include "utils.h"
@@ -127,9 +127,12 @@ VideoDisplay::VideoDisplay(
 	Bind(wxEVT_LEFT_UP, &VideoDisplay::OnMouseEvent, this);
 	Bind(wxEVT_MOTION, &VideoDisplay::OnMouseEvent, this);
 	Bind(wxEVT_MOUSEWHEEL, &VideoDisplay::OnMouseWheel, this);
-	
 
 	SetCursor(wxNullCursor);
+
+	retinaHelper = agi::util::make_unique<RetinaHelper>(this);
+	retinaHelper->setViewWantsBestResolutionOpenGLSurface(true);
+	scaleFactor = retinaHelper->getBackingScaleFactor();
 
 	c->videoDisplay = this;
 
@@ -154,10 +157,6 @@ bool VideoDisplay::InitContext() {
 		glContext = agi::util::make_unique<wxGLContext>(this);
 
 	SetCurrent(*glContext);
-	
-	retinaHelper = agi::util::make_unique<RetinaHelper>(this);
-	retinaHelper->setViewWantsBestResolutionOpenGLSurface(true);
-	
 	return true;
 }
 
@@ -202,13 +201,11 @@ void VideoDisplay::Render() try {
 	if (videoSize.GetWidth() == 0) videoSize.SetWidth(1);
 	if (videoSize.GetHeight() == 0) videoSize.SetHeight(1);
 
-	scaleFactor = retinaHelper->getBackingScaleFactor();
-
 	if (!viewport_height || !viewport_width)
 		PositionVideo();
 
 	videoOut->Render(viewport_left, viewport_bottom, viewport_width, viewport_height);
-	E(glViewport(0, std::min(viewport_bottom, 0), videoSize.GetWidth() * scaleFactor, videoSize.GetHeight() * scaleFactor));
+	E(glViewport(0, std::min(viewport_bottom, 0), videoSize.GetWidth(), videoSize.GetHeight()));
 
 	E(glMatrixMode(GL_PROJECTION));
 	E(glLoadIdentity());
@@ -285,10 +282,10 @@ void VideoDisplay::PositionVideo() {
 	if (!con->videoController->IsLoaded() || !IsShownOnScreen()) return;
 
 	viewport_left = 0;
-	viewport_bottom = GetClientSize().GetHeight() - videoSize.GetHeight();
+	viewport_bottom = GetClientSize().GetHeight() * scaleFactor - videoSize.GetHeight();
 	viewport_top = 0;
-	viewport_width = videoSize.GetWidth() * scaleFactor;
-	viewport_height = videoSize.GetHeight() * scaleFactor;
+	viewport_width = videoSize.GetWidth();
+	viewport_height = videoSize.GetHeight();
 
 	if (freeSize) {
 		int vidW = con->videoController->GetWidth();
@@ -319,12 +316,12 @@ void VideoDisplay::PositionVideo() {
 }
 
 void VideoDisplay::UpdateSize() {
+	scaleFactor = retinaHelper->getBackingScaleFactor();
+
 	if (!con->videoController->IsLoaded() || !IsShownOnScreen()) return;
-	
+
 	videoSize.Set(con->videoController->GetWidth(), con->videoController->GetHeight());
-	
 	videoSize *= zoomValue;
-	
 	if (con->videoController->GetAspectRatioType() != AspectRatio::Default)
 		videoSize.SetWidth(videoSize.GetHeight() * con->videoController->GetAspectRatioValue());
 
@@ -335,12 +332,13 @@ void VideoDisplay::UpdateSize() {
 
 		wxSize cs = GetClientSize();
 		wxSize oldSize = top->GetSize();
-		top->SetSize(top->GetSize() + videoSize - cs);
+		top->SetSize(top->GetSize() + videoSize * (1.0f / scaleFactor) - cs);
 		SetClientSize(cs + top->GetSize() - oldSize);
 	}
 	else {
-		SetMinClientSize(videoSize);
-		SetMaxClientSize(videoSize);
+		auto scaledSize = wxSize(videoSize.GetWidth() / scaleFactor, videoSize.GetHeight() / scaleFactor);
+		SetMinClientSize(scaledSize);
+		SetMaxClientSize(scaledSize);
 
 		GetGrandParent()->Layout();
 	}
@@ -349,10 +347,15 @@ void VideoDisplay::UpdateSize() {
 }
 
 void VideoDisplay::OnSizeEvent(wxSizeEvent &event) {
+	scaleFactor = retinaHelper->getBackingScaleFactor();
+	
+	if(tool)
+		tool->SetScaleFactor(scaleFactor);
+	
 	if (freeSize) {
 		videoSize = GetClientSize();
 		PositionVideo();
-		zoomValue = double(viewport_height) / con->videoController->GetHeight();
+		zoomValue = double(viewport_height) / con->videoController->GetHeight() * scaleFactor;
 		zoomBox->ChangeValue(wxString::Format("%g%%", zoomValue * 100.));
 	}
 	else {
@@ -428,6 +431,8 @@ void VideoDisplay::SetTool(std::unique_ptr<VisualToolBase> new_tool) {
 	tool = std::move(new_tool);
 	tool->SetToolbar(toolBar);
 
+	tool->SetScaleFactor(scaleFactor);
+
 	// Update size as the new typesetting tool may have changed the subtoolbar size
 	UpdateSize();
 }
@@ -441,7 +446,6 @@ Vector2D VideoDisplay::GetMousePosition() const {
 }
 
 void VideoDisplay::Unload() {
-	retinaHelper.reset();
 	glContext.reset();
 	videoOut.reset();
 	tool.reset();
