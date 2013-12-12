@@ -25,8 +25,16 @@
 #include <boost/range/iterator_range.hpp>
 #include <fstream>
 
-AssAttachment::AssAttachment(std::string const& name, AssEntryGroup group)
-: filename(name)
+AssAttachment::AssAttachment(AssAttachment const& rgt)
+: entry_data(rgt.entry_data)
+, filename(rgt.filename)
+, group(rgt.group)
+{
+}
+
+AssAttachment::AssAttachment(std::string const& header, AssEntryGroup group)
+: entry_data(header + "\r\n")
+, filename(header.substr(10))
 , group(group)
 {
 }
@@ -35,7 +43,7 @@ AssAttachment::AssAttachment(agi::fs::path const& name, AssEntryGroup group)
 : filename(name.filename().string())
 , group(group)
 {
-	// SSA stuffs some information about the font in the embeded filename, but
+	// SSA stuffs some information about the font in the embedded filename, but
 	// nothing else uses it so just do the absolute minimum (0 is the encoding)
 	if (boost::iends_with(filename.get(), ".ttf"))
 		filename = filename.get().substr(0, filename.get().size() - 4) + "_0" + filename.get().substr(filename.get().size() - 4);
@@ -52,9 +60,7 @@ AssAttachment::AssAttachment(agi::fs::path const& name, AssEntryGroup group)
 }
 
 AssEntry *AssAttachment::Clone() const {
-	auto clone = new AssAttachment(filename, group);
-	clone->entry_data = entry_data;
-	return clone;
+	return new AssAttachment(*this);
 }
 
 const std::string AssAttachment::GetEntryData() const {
