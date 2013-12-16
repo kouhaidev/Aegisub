@@ -60,14 +60,7 @@
 
 VideoContext::VideoContext()
 : playback(this)
-, start_ms(0)
-, end_frame(0)
-, frame_n(0)
-, ar_value(1.)
-, ar_type(AspectRatio::Default)
-, has_subtitles(false)
 , playAudioOnStep(OPT_GET("Audio/Plays When Stepping Video"))
-, no_amend(false)
 {
 	Bind(EVT_VIDEO_ERROR, &VideoContext::OnVideoError, this);
 	Bind(EVT_SUBTITLES_ERROR, &VideoContext::OnSubtitlesError, this);
@@ -456,7 +449,7 @@ void VideoContext::SaveTimecodes(agi::fs::path const& filename) {
 void VideoContext::CloseTimecodes() {
 	ovr_fps = agi::vfr::Framerate();
 	timecodes_filename.clear();
-	OnSubtitlesCommit(0, std::set<const AssEntry*>());
+    OnSubtitlesCommit(0, std::set<const AssEntry*>());
 	TimecodesOpen(video_fps);
 }
 

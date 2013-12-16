@@ -142,7 +142,6 @@ static wxTextCtrl *num_text_ctrl(wxWindow *parent, double *value, bool allow_neg
 DialogStyleEditor::DialogStyleEditor(wxWindow *parent, AssStyle *style, agi::Context *c, AssStyleStorage *store, std::string const& new_name, wxArrayString const& font_list)
 : wxDialog (parent, -1, _("Style Editor"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 , c(c)
-, is_new(false)
 , style(style)
 , store(store)
 {
@@ -366,18 +365,18 @@ DialogStyleEditor::DialogStyleEditor(wxWindow *parent, AssStyle *style, agi::Con
 
 	Bind(wxEVT_CHILD_FOCUS, &DialogStyleEditor::OnChildFocus, this);
 
-	Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &DialogStyleEditor::OnCommandPreviewUpdate, this);
-	Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &DialogStyleEditor::OnCommandPreviewUpdate, this);
-	Bind(wxEVT_COMMAND_SPINCTRL_UPDATED, &DialogStyleEditor::OnCommandPreviewUpdate, this);
+	Bind(wxEVT_CHECKBOX, &DialogStyleEditor::OnCommandPreviewUpdate, this);
+	Bind(wxEVT_COMBOBOX, &DialogStyleEditor::OnCommandPreviewUpdate, this);
+	Bind(wxEVT_SPINCTRL, &DialogStyleEditor::OnCommandPreviewUpdate, this);
 
 	previewButton->Bind(EVT_COLOR, &DialogStyleEditor::OnPreviewColourChange, this);
-	FontName->Bind(wxEVT_COMMAND_TEXT_ENTER, &DialogStyleEditor::OnCommandPreviewUpdate, this);
-	PreviewText->Bind(wxEVT_COMMAND_TEXT_UPDATED, &DialogStyleEditor::OnPreviewTextChange, this);
+	FontName->Bind(wxEVT_TEXT_ENTER, &DialogStyleEditor::OnCommandPreviewUpdate, this);
+	PreviewText->Bind(wxEVT_TEXT, &DialogStyleEditor::OnPreviewTextChange, this);
 
-	Bind(wxEVT_COMMAND_BUTTON_CLICKED, std::bind(&DialogStyleEditor::Apply, this, true, true), wxID_OK);
-	Bind(wxEVT_COMMAND_BUTTON_CLICKED, std::bind(&DialogStyleEditor::Apply, this, true, false), wxID_APPLY);
-	Bind(wxEVT_COMMAND_BUTTON_CLICKED, std::bind(&DialogStyleEditor::Apply, this, false, true), wxID_CANCEL);
-	Bind(wxEVT_COMMAND_BUTTON_CLICKED, std::bind(&HelpButton::OpenPage, "Style Editor"), wxID_HELP);
+	Bind(wxEVT_BUTTON, std::bind(&DialogStyleEditor::Apply, this, true, true), wxID_OK);
+	Bind(wxEVT_BUTTON, std::bind(&DialogStyleEditor::Apply, this, true, false), wxID_APPLY);
+	Bind(wxEVT_BUTTON, std::bind(&DialogStyleEditor::Apply, this, false, true), wxID_CANCEL);
+	Bind(wxEVT_BUTTON, std::bind(&HelpButton::OpenPage, "Style Editor"), wxID_HELP);
 
 	for (auto const& elem : colorButton)
 		elem->Bind(EVT_COLOR, &DialogStyleEditor::OnSetColor, this);

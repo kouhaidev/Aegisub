@@ -100,17 +100,17 @@ class YUV4MPEGVideoProvider : public VideoProvider {
 		Y4M_FFLAG_C_UNKNOWN = 0x0800	/// unknown (only allowed for non-4:2:0 sampling)
 	};
 
-	FILE *sf;		/// source file
-	bool inited;	/// initialization state
+	FILE *sf = nullptr;		/// source file
+	bool inited = false;	/// initialization state
 
-	int w, h;		/// frame width/height
-	int num_frames; /// length of file in frames
+	int w = 0, h = 0;	/// frame width/height
+	int num_frames = -1; /// length of file in frames
 	int frame_sz;	/// size of each frame in bytes
 	int luma_sz;	/// size of the luma plane of each frame, in bytes
 	int chroma_sz;	/// size of one of the two chroma planes of each frame, in bytes
 
-	Y4M_PixelFormat pixfmt;		/// colorspace/pixel format
-	Y4M_InterlacingMode imode;	/// interlacing mode (for the entire stream)
+	Y4M_PixelFormat pixfmt = Y4M_PIXFMT_NONE;		/// colorspace/pixel format
+	Y4M_InterlacingMode imode = Y4M_ILACE_NOTSET;	/// interlacing mode (for the entire stream)
 	struct {
 		int num;	/// numerator
 		int den;	/// denominator
@@ -139,7 +139,7 @@ public:
 	int GetHeight() const override                 { return h; }
 	double GetDAR() const override                 { return 0; }
 	agi::vfr::Framerate GetFPS() const override    { return fps; }
-	std::vector<int> GetKeyFrames() const override { return std::vector<int>(); }
+	std::vector<int> GetKeyFrames() const override { return {}; }
 	std::string GetColorSpace() const override     { return "TV.601"; }
 	std::string GetDecoderName() const override    { return "YU4MPEG"; }
 	bool WantsCaching() const override             { return true; }

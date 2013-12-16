@@ -53,15 +53,8 @@ const wxColour VisualToolBase::colour[] = {
 VisualToolBase::VisualToolBase(VideoDisplay *parent, agi::Context *context)
 : c(context)
 , parent(parent)
-, holding(false)
-, active_line(nullptr)
-, dragging(false)
 , frame_number(c->videoController->GetFrameN())
-, shift_down(false)
-, ctrl_down(false)
-, alt_down(false)
 , file_changed_connection(c->ass->AddCommitListener(&VisualToolBase::OnCommit, this))
-, commit_id(-1)
 {
 	int script_w, script_h;
 	c->ass->GetResolution(script_w, script_h);
@@ -173,8 +166,6 @@ Vector2D VisualToolBase::FromScriptCoords(Vector2D point) const {
 template<class FeatureType>
 VisualTool<FeatureType>::VisualTool(VideoDisplay *parent, agi::Context *context)
 : VisualToolBase(parent, context)
-, sel_changed(false)
-, active_feature(nullptr)
 {
 }
 
@@ -271,9 +262,7 @@ void VisualTool<FeatureType>::OnMouseEvent(wxMouseEvent &event) {
 		else {
 			if (!alt_down && features.size() > 1) {
 				sel_features.clear();
-				SubtitleSelection sel;
-				sel.insert(c->selectionController->GetActiveLine());
-				c->selectionController->SetSelectedSet(sel);
+				c->selectionController->SetSelectedSet({ c->selectionController->GetActiveLine() });
 			}
 			if (active_line && InitializeHold()) {
 				holding = true;
@@ -458,6 +447,17 @@ void VisualToolBase::GetLineRotation(AssDialogue *diag, float &rx, float &ry, fl
 		rz = tag->front().Get(rz);
 	else if ((tag = find_tag(blocks, "\\fr")))
 		rz = tag->front().Get(rz);
+}
+
+void VisualToolBase::GetLineShear(AssDialogue *diag, float& fax, float& fay) {
+	fax = fay = 0.f;
+
+	boost::ptr_vector<AssDialogueBlock> blocks(diag->ParseTags());
+
+	if (param_vec tag = find_tag(blocks, "\\fax"))
+		fax = tag->front().Get(fax);
+	if (param_vec tag = find_tag(blocks, "\\fay"))
+		fay = tag->front().Get(fay);
 }
 
 void VisualToolBase::GetLineScale(AssDialogue *diag, Vector2D &scale) {

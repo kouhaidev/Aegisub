@@ -100,16 +100,8 @@ namespace std {
 
 BaseGrid::BaseGrid(wxWindow* parent, agi::Context *context, const wxSize& size, long style, const wxString& name)
 : wxWindow(parent, -1, wxDefaultPosition, size, style, name)
-, lineHeight(1) // non-zero to avoid div by 0
-, holding(false)
 , scrollBar(new wxScrollBar(this, GRID_SCROLLBAR, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL))
-, byFrame(false)
-, extendRow(-1)
-, active_line(nullptr)
-, batch_level(0)
-, batch_active_line_changed(false)
 , seek_listener(context->videoController->AddSeekListener(std::bind(&BaseGrid::Refresh, this, false, nullptr)))
-, yPos(0)
 , context(context)
 {
 	scrollBar->SetScrollbar(0,10,100,10);
@@ -330,11 +322,8 @@ void BaseGrid::UpdateMaps(bool preserve_selected_rows) {
 			SetActiveLine(index_line_map.back());
 	}
 
-	if (selection.empty() && active_line) {
-		Selection sel;
-		sel.insert(active_line);
-		SetSelectedSet(sel);
-	}
+	if (selection.empty() && active_line)
+		SetSelectedSet({ active_line });
 
 	EndBatch();
 
@@ -717,9 +706,8 @@ void BaseGrid::OnMouseEvent(wxMouseEvent &event) {
 			// Toggle each
 			Selection newsel;
 			if (ctrl) newsel = selection;
-			for (int i = i1; i <= i2; i++) {
+			for (int i = i1; i <= i2; i++)
 				newsel.insert(GetDialogue(i));
-			}
 			SetSelectedSet(newsel);
 			return;
 		}
@@ -1061,22 +1049,14 @@ void BaseGrid::SetSelectionAndActive(Selection const& new_selection, AssDialogue
 
 void BaseGrid::PrevLine() {
 	int cur_line_i = GetDialogueIndex(GetActiveLine());
-	if (AssDialogue *prev_line = GetDialogue(cur_line_i-1)) {
-		SetActiveLine(prev_line);
-		Selection newsel;
-		newsel.insert(prev_line);
-		SetSelectedSet(newsel);
-	}
+	if (AssDialogue *prev_line = GetDialogue(cur_line_i-1))
+		SetSelectionAndActive({ prev_line }, prev_line);
 }
 
 void BaseGrid::NextLine() {
 	int cur_line_i = GetDialogueIndex(GetActiveLine());
-	if (AssDialogue *next_line = GetDialogue(cur_line_i+1)) {
-		SetActiveLine(next_line);
-		Selection newsel;
-		newsel.insert(next_line);
-		SetSelectedSet(newsel);
-	}
+	if (AssDialogue *next_line = GetDialogue(cur_line_i+1))
+		SetSelectionAndActive({ next_line }, next_line);
 }
 
 void BaseGrid::AnnounceActiveLineChanged(AssDialogue *new_line) {

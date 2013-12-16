@@ -115,8 +115,6 @@ public:
 DialogProgress::DialogProgress(wxWindow *parent, wxString const& title_text, wxString const& message)
 : wxDialog(parent, -1, title_text, wxDefaultPosition, wxDefaultSize, wxBORDER_RAISED)
 , pulse_timer(GetEventHandler())
-, progress_current(0)
-, progress_target(0)
 {
 	title = new wxStaticText(this, -1, title_text, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
 	gauge = new wxGauge(this, -1, 300, wxDefaultPosition, wxSize(300,20));
@@ -166,7 +164,7 @@ void DialogProgress::Run(std::function<void(agi::ProgressSink*)> task, int prior
 
 			// Unbind the cancel handler so that the default behavior happens (i.e. the
 			// dialog is closed) as there's no longer a task to cancel
-			Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &DialogProgress::OnCancel, this, wxID_CANCEL);
+			Unbind(wxEVT_BUTTON, &DialogProgress::OnCancel, this, wxID_CANCEL);
 
 			// If it ran to completion and there is debug output, leave the window open
 			// so the user can read the debug output and switch the cancel button to a
@@ -187,7 +185,7 @@ void DialogProgress::Run(std::function<void(agi::ProgressSink*)> task, int prior
 void DialogProgress::OnShow(wxShowEvent&) {
 	// Restore the cancel button in case it was previously switched to a close
 	// button
-	Bind(wxEVT_COMMAND_BUTTON_CLICKED, &DialogProgress::OnCancel, this, wxID_CANCEL);
+	Bind(wxEVT_BUTTON, &DialogProgress::OnCancel, this, wxID_CANCEL);
 	cancel_button->SetLabelText(_("Cancel"));
 	cancel_button->Enable();
 

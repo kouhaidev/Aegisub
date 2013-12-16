@@ -27,11 +27,6 @@
 
 VisualToolRotateXY::VisualToolRotateXY(VideoDisplay *parent, agi::Context *context)
 : VisualTool<VisualDraggableFeature>(parent, context)
-, angle_x(0)
-, angle_y(0)
-, angle_z(0)
-, orig_x(0)
-, orig_y(0)
 {
 	org = new Feature;
 	org->type = DRAG_BIG_TRIANGLE;
@@ -46,6 +41,7 @@ void VisualToolRotateXY::Draw() {
 	// Transform grid
 	gl.SetOrigin(org->pos);
 	gl.SetRotation(angle_x, angle_y, angle_z);
+	gl.SetShear(fax, fay);
 
 	// Draw grid
 	gl.SetLineColour(colour[0], 0.5f, 2);
@@ -54,20 +50,30 @@ void VisualToolRotateXY::Draw() {
 	float g = colour[0].Green() / 255.f;
 	float b = colour[0].Blue() / 255.f;
 
-	std::vector<float> colors(11 * 8 * 4);
-	for (int i = 0; i < 88; ++i) {
+	// Number of lines on each side of each axis
+	static const int radius = 15;
+	// Total number of lines, including center axis line
+	static const int line_count = radius * 2 + 1;
+	// Distance between each line in pixels
+	static const int spacing = 20;
+	// Length of each grid line in pixels from axis to one end
+	static const int half_line_length = spacing * (radius + 1);
+	static const float fade_factor = 0.9f / radius;
+
+	std::vector<float> colors(line_count * 8 * 4);
+	for (int i = 0; i < line_count * 8; ++i) {
 		colors[i * 4 + 0] = r;
 		colors[i * 4 + 1] = g;
 		colors[i * 4 + 2] = b;
-		colors[i * 4 + 3] = (i + 3) % 4 > 1 ? 0 : (1.f - abs(i / 8 - 5) * 0.18f);
+		colors[i * 4 + 3] = (i + 3) % 4 > 1 ? 0 : (1.f - abs(i / 8 - radius) * fade_factor);
 	}
 
-	std::vector<float> points(11 * 8 * 2);
-	for (int i = 0; i < 11; ++i) {
-		int pos = 20 * (i - 5);
+	std::vector<float> points(line_count * 8 * 2);
+	for (int i = 0; i < line_count; ++i) {
+		int pos = spacing * (i - radius);
 
 		points[i * 16 + 0] = pos;
-		points[i * 16 + 1] = 120;
+		points[i * 16 + 1] = half_line_length;
 
 		points[i * 16 + 2] = pos;
 		points[i * 16 + 3] = 0;
@@ -76,9 +82,9 @@ void VisualToolRotateXY::Draw() {
 		points[i * 16 + 5] = 0;
 
 		points[i * 16 + 6] = pos;
-		points[i * 16 + 7] = -120;
+		points[i * 16 + 7] = -half_line_length;
 
-		points[i * 16 + 8] = 120;
+		points[i * 16 + 8] = half_line_length;
 		points[i * 16 + 9] = pos;
 
 		points[i * 16 + 10] = 0;
@@ -87,7 +93,7 @@ void VisualToolRotateXY::Draw() {
 		points[i * 16 + 12] = 0;
 		points[i * 16 + 13] = pos;
 
-		points[i * 16 + 14] = -120;
+		points[i * 16 + 14] = -half_line_length;
 		points[i * 16 + 15] = pos;
 	}
 
@@ -173,4 +179,5 @@ void VisualToolRotateXY::DoRefresh() {
 	org->pos = FromScriptCoords(org->pos);
 
 	GetLineRotation(active_line, angle_x, angle_y, angle_z);
+	GetLineShear(active_line, fax, fay);
 }

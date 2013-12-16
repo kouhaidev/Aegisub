@@ -96,19 +96,14 @@ VideoDisplay::VideoDisplay(
 : wxGLCanvas(parent, -1, attribList)
 , autohideTools(OPT_GET("Tool/Visual/Autohide"))
 , con(c)
-, viewport_left(0)
-, viewport_width(0)
-, viewport_bottom(0)
-, viewport_top(0)
-, viewport_height(0)
 , zoomValue(OPT_GET("Video/Default Zoom")->GetInt() * .125 + .125)
 , toolBar(visualSubToolBar)
 , zoomBox(zoomBox)
 , freeSize(freeSize)
 {
 	zoomBox->SetValue(wxString::Format("%g%%", zoomValue * 100.));
-	zoomBox->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &VideoDisplay::SetZoomFromBox, this);
-	zoomBox->Bind(wxEVT_COMMAND_TEXT_ENTER, &VideoDisplay::SetZoomFromBoxText, this);
+	zoomBox->Bind(wxEVT_COMBOBOX, &VideoDisplay::SetZoomFromBox, this);
+	zoomBox->Bind(wxEVT_TEXT_ENTER, &VideoDisplay::SetZoomFromBoxText, this);
 
 	con->videoController->Bind(EVT_FRAME_READY, &VideoDisplay::UploadFrameData, this);
 	slots.push_back(con->videoController->AddVideoOpenListener(&VideoDisplay::UpdateSize, this));

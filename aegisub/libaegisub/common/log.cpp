@@ -44,10 +44,7 @@ LogSink *log;
 /// Keep this ordered the same as Severity
 const char *Severity_ID = "EAWID";
 
-LogSink::LogSink()
-: messages(250)
-, queue(dispatch::Create())
-{ }
+LogSink::LogSink() : queue(dispatch::Create()) { }
 
 LogSink::~LogSink() {
 	// The destructor for emitters may try to log messages, so disable all the

@@ -48,8 +48,6 @@ static const DraggableFeatureType DRAG_END = DRAG_BIG_CIRCLE;
 
 VisualToolDrag::VisualToolDrag(VideoDisplay *parent, agi::Context *context)
 : VisualTool<VisualToolDragDraggableFeature>(parent, context)
-, primary(nullptr)
-, button_is_move(true)
 {
 	c->selectionController->GetSelectedSet(selection);
 	connections.push_back(c->selectionController->AddSelectionListener(&VisualToolDrag::OnSelectedSetChanged, this));
@@ -61,7 +59,7 @@ void VisualToolDrag::SetToolbar(wxToolBar *tb) {
 	toolbar->Realize();
 	toolbar->Show(true);
 
-	toolbar->Bind(wxEVT_COMMAND_TOOL_CLICKED, &VisualToolDrag::OnSubTool, this);
+	toolbar->Bind(wxEVT_TOOL, &VisualToolDrag::OnSubTool, this);
 }
 
 void VisualToolDrag::UpdateToggleButtons() {

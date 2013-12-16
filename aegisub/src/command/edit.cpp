@@ -525,10 +525,7 @@ static void delete_lines(agi::Context *c, wxString const& commit_message) {
 	}
 
 	c->ass->Commit(commit_message, AssFile::COMMIT_DIAG_ADDREM);
-
-	sel.clear();
-	sel.insert(new_active);
-	c->selectionController->SetSelectionAndActive(sel, new_active);
+	c->selectionController->SetSelectionAndActive({ new_active }, new_active);
 }
 
 struct edit_line_copy : public validate_sel_nonempty {
@@ -878,8 +875,8 @@ struct edit_line_paste_over : public Command {
 
 namespace {
 std::string trim_text(std::string text) {
-	boost::regex start("^( |\t|\\\\[nNh])+");
-	boost::regex end("( |\t|\\\\[nNh])+$");
+	boost::regex start(R"(^( |	|\\[nNh])+)");
+	boost::regex end(R"(( |	|\\[nNh])+$)");
 
 	text = regex_replace(text, start, "", boost::format_first_only);
 	text = regex_replace(text, end, "", boost::format_first_only);

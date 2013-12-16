@@ -92,15 +92,15 @@ protected:
 	agi::Context *c;
 	VideoDisplay *parent;
 
-	bool holding; ///< Is a hold currently in progress?
-	AssDialogue *active_line; ///< Active dialogue line; nullptr if it is not visible on the current frame
-	bool dragging; ///< Is a drag currently in progress?
+	bool holding = false; ///< Is a hold currently in progress?
+	AssDialogue *active_line = nullptr; ///< Active dialogue line; nullptr if it is not visible on the current frame
+	bool dragging = false; ///< Is a drag currently in progress?
 
 	int frame_number; ///< Current frame number
 
-	bool shift_down; ///< Is shift down?
-	bool ctrl_down; ///< Is ctrl down?
-	bool alt_down; ///< Is alt down?
+	bool shift_down = false; ///< Is shift down?
+	bool ctrl_down = false; ///< Is ctrl down?
+	bool alt_down = false; ///< Is alt down?
 
 	Vector2D mouse_pos; ///< Last seen mouse position
 	Vector2D drag_start; ///< Mouse position at the beginning of the last drag
@@ -111,7 +111,7 @@ protected:
 	float scaleFactor;
 
 	agi::signal::Connection file_changed_connection;
-	int commit_id; ///< Last used commit id for coalescing
+	int commit_id = -1; ///< Last used commit id for coalescing
 
 	/// @brief Commit the current file state
 	/// @param message Description of changes for undo
@@ -124,6 +124,7 @@ protected:
 	Vector2D GetLineOrigin(AssDialogue *diag);
 	bool GetLineMove(AssDialogue *diag, Vector2D &p1, Vector2D &p2, int &t1, int &t2);
 	void GetLineRotation(AssDialogue *diag, float &rx, float &ry, float &rz);
+	void GetLineShear(AssDialogue *diag, float& fax, float& fay);
 	void GetLineScale(AssDialogue *diag, Vector2D &scale);
 	void GetLineClip(AssDialogue *diag, Vector2D &p1, Vector2D &p2, bool &inverse);
 	std::string GetLineVectorClip(AssDialogue *diag, int &scale, bool &inverse);
@@ -156,7 +157,7 @@ protected:
 	typedef agi::owning_intrusive_list<FeatureType> feature_list;
 
 private:
-	bool sel_changed; /// Has the selection already been changed in the current click?
+	bool sel_changed = false; /// Has the selection already been changed in the current click?
 
 	/// @brief Called when a hold is begun
 	/// @return Should the hold actually happen?
@@ -179,7 +180,7 @@ protected:
 	std::set<FeatureType *> sel_features; ///< Currently selected visual features
 
 	/// Topmost feature under the mouse; generally only valid during a drag
-	FeatureType *active_feature;
+	FeatureType *active_feature = nullptr;
 	/// List of features which are drawn and can be clicked on
 	/// List is used here for the iterator invalidation properties
 	feature_list features;

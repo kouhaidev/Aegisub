@@ -52,9 +52,6 @@ enum {
 VisualToolVectorClip::VisualToolVectorClip(VideoDisplay *parent, agi::Context *context)
 : VisualTool<VisualToolVectorClipDraggableFeature>(parent, context)
 , spline(*this)
-, toolBar(nullptr)
-, mode(0)
-, inverse(false)
 {
 }
 
@@ -77,7 +74,7 @@ void VisualToolVectorClip::SetToolbar(wxToolBar *toolBar) {
 	toolBar->ToggleTool(BUTTON_DRAG, true);
 	toolBar->Realize();
 	toolBar->Show(true);
-	toolBar->Bind(wxEVT_COMMAND_TOOL_CLICKED, [=](wxCommandEvent& e) { SetMode(e.GetId() - BUTTON_DRAG); });
+	toolBar->Bind(wxEVT_TOOL, [=](wxCommandEvent& e) { SetMode(e.GetId() - BUTTON_DRAG); });
 	SetMode(features.empty());
 #undef ICON
 }
