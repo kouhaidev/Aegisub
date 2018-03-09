@@ -150,7 +150,7 @@ public:
 		}
 
 		// Remove old entries until we're under the max size
-		for (auto it = age.rbegin(); size > max_size && it != age.rend(); it++)
+		for (auto it = age.begin(); size > max_size && it != age.end(); it = age.begin())
 			KillMacroBlock(**it);
 	}
 
@@ -171,12 +171,18 @@ public:
 		if (mb.blocks.empty())
 		{
 			mb.blocks.resize(macroblock_size);
-			age.push_front(&mb);
+			age.push_back(&mb);
 		}
-		else if (mb.position != begin(age))
-			age.splice(begin(age), age, mb.position);
+		else
+		{
+			auto pos = mb.position;
+			pos++;
+			if (pos != end(age))
+				age.splice(end(age), age, mb.position);
+		}
 
-		mb.position = age.begin();
+		mb.position = age.end();
+		mb.position--;
 
 		size_t block_index = i & macroblock_index_mask;
 		assert(block_index < mb.blocks.size());
