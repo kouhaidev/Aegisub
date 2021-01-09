@@ -18,6 +18,7 @@
 
 #include <libaegisub/fs.h>
 #include <libaegisub/keyframe.h>
+#include <libaegisub/vfr.h>
 
 #include <fstream>
 #include <iterator>
@@ -26,6 +27,7 @@
 #include <util.h>
 
 using namespace agi::keyframe;
+using namespace agi::vfr;
 using namespace util;
 
 TEST(lagi_keyframe, save) {
