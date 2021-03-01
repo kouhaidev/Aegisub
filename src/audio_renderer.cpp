@@ -62,7 +62,7 @@ std::unique_ptr<wxBitmap> AudioRendererBitmapCacheBitmapFactory::ProduceBlock(in
 
 size_t AudioRendererBitmapCacheBitmapFactory::GetBlockSize() const
 {
-	return sizeof(wxBitmap) + renderer->cache_bitmap_width * renderer->pixel_height * 3;
+	return sizeof(wxBitmap) + renderer->cache_bitmap_width * renderer->pixel_height * 4;
 }
 
 AudioRenderer::AudioRenderer()
