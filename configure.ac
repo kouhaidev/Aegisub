@@ -220,7 +220,7 @@ AX_BOOST_THREAD
 
 cppflags_bak="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
-AC_CHECK_HEADERS([boost/spirit/home/phoenix/version.hpp])
+AC_CHECK_HEADERS([boost/spirit/include/phoenix_version.hpp])
 CPPFLAGS=$cppflags_bak
 
 AC_DEFINE(BOOST_SYSTEM_NO_DEPRECATED, 1,
