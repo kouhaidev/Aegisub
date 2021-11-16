@@ -76,7 +76,7 @@ wxWidgets is located in vendor/wxWidgets, and can be built like so:
 	--with-libpng=yes --with-macosx-version-min=10.9 \
 	--with-opengl \
 	--without-libjpeg --without-libtiff --without-regex \
-	&& make
+	&& make -j10
 
 Once the dependencies are installed, build Aegisub with `autoreconf && ./configure --with-wxdir=/path/to/Aegisub/vendor/wxWidgets && make && make osx-bundle`.
 `autoreconf` should be skipped if you are building from a source tarball rather than `git`.
