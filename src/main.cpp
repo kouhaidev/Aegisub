@@ -65,6 +65,8 @@
 #include <libaegisub/path.h>
 #include <libaegisub/util.h>
 
+#include <OpenGL/OpenGL.h>
+
 #include <boost/interprocess/streams/bufferstream.hpp>
 #include <boost/locale.hpp>
 #include <locale>
@@ -123,6 +125,13 @@ bool AegisubApp::OnInit() {
 	// The logger isn't created on demand on background threads, so force it to
 	// be created now
 	(void)wxLog::GetActiveTarget();
+
+  CGLPixelFormatObj dummy;
+  GLint dummy2;
+  CGLPixelFormatAttribute attrlist[] = {
+    (CGLPixelFormatAttribute)0
+  };
+  CGLChoosePixelFormat(attrlist, &dummy, &dummy2);
 
 	{
 		// Try to get the UTF-8 version of the current locale
