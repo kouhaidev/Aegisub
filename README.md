@@ -54,26 +54,35 @@ For personal usage, you can use homebrew to install almost all of Aegisub's depe
 
 wxWidgets is located in vendor/wxWidgets, and can be built like so:
 
-	CPPFLAGS="$CPPFLAGS -D__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES=1" \
-	./configure --disable-aboutdlg --disable-animatectrl --disable-aui --disable-any \
-	--disable-bannerwindow --disable-base64 --disable-calendar --disable-caret \
-	--disable-cmdline --disable-colourpicker --disable-compat28 --disable-config \
-	--disable-constraints --disable-datepick --disable-dctransform --disable-debugreport \
-	--disable-dialupman --disable-docview --disable-filehistory --disable-finddlg \
-	--disable-fs_archive --disable-fs_inet --disable-fs_zip --disable-fsvolume \
-	--disable-fswatcher --disable-gif --disable-help --disable-html --disable-ipc \
-	--disable-joystick --disable-jpeg --disable-largefile --disable-markup --disable-mdi \
-	--disable-mediactrl --disable-metafiles --disable-miniframe --disable-notifmsg \
-	--disable-numberdlg --disable-pcx --disable-pnm --disable-postscript \
-	--disable-prefseditor --disable-printarch --disable-progressdlg --disable-propgrid \
-	--disable-protocol --disable-protocols --disable-rearrangectrl --disable-ribbon \
-	--disable-richtext --disable-richtooltip --disable-snglinst --disable-sockets \
-	--disable-sockets --disable-sound --disable-splash --disable-splines \
-	--disable-std_iostreams --disable-svg --disable-tarstream --disable-tiff \
-	--disable-tipdlg --disable-tipwindow --disable-url --disable-webkit --disable-webview \
-	--disable-wizarddlg --disable-xrc \
-	--enable-geometry --enable-imaglist --enable-listctrl --enable-stc --with-cocoa \
-	--with-libpng=yes --with-macosx-version-min=10.9 \
+	CPPFLAGS="$CPPFLAGS -D__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES=0" \
+	./configure --disable-all-features \
+	--enable-unicode --enable-utf8 --enable-stl \
+	--enable-exceptions --enable-log --enable-threads --enable-palette \
+	--enable-baseevtloop --enable-selectloop --enable-gui --enable-timer --enable-menus \
+	--enable-intl --enable-xlocale --enable-statusbar --enable-sysoptions \
+	--enable-button --enable-bmpbutton --enable-listbook --enable-listbox --enable-listctrl \
+	--enable-checkbox --enable-textctrl --enable-hyperlink --enable-treebook \
+	--enable-image --enable-stopwatch --enable-scrollbar --enable-longlong \
+	--enable-geometry --enable-imaglist --enable-stc --enable-hotkey --enable-regkey \
+	--enable-graphics_ctx --enable-dataobj --enable-file --enable-ffile \
+	--enable-streams --enable-dragimage --enable-dnd --enable-radiobox --enable-radiobtn \
+	--enable-spinbtn --enable-spinctrl --enable-slider --enable-searchctrl \
+	--enable-stattext --enable-statline --enable-statbox --enable-statbmp \
+	--enable-toolbar --enable-tbarnative --enable-clipboard --enable-menubar \
+	--enable-msgdlg --enable-filedlg --enable-fontdlg --enable-textdlg --enable-choicedlg \
+	--enable-coldlg --enable-dirdlg --enable-numberdlg --enable-aboutdlg \
+	--enable-dataviewctrl --enable-datepick --enable-dirpicker --enable-filectrl \
+	--enable-filepicker --enable-fontpicker --enable-treectrl --enable-comboctrl \
+	--enable-rearrangectrl --enable-treelist --enable-timepick --enable-accel \
+	--enable-headerctrl --enable-variant --enable-datetime --enable-checklst \
+	--enable-choice --enable-choicebook --enable-combobox --enable-gauge \
+	--enable-tooltips --enable-validators --enable-std_string --enable-std-containers \
+	--enable-popupwin --enable-controls --enable-stc --enable-calendar \
+	--enable-sash --enable-splitter --enable-arcstream --enable-zipstream \
+	--enable-xpm --enable-dynlib --enable-dynamicloader --enable-fontenum \
+	--with-zlib --with-expat --with-libpng \
+	--with-cocoa \
+	--with-macosx-version-min=no \
 	--with-opengl \
 	--without-libjpeg --without-libtiff --without-regex \
 	&& make -j10
