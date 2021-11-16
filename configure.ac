@@ -1,4 +1,4 @@
-AC_PREREQ(2.57)
+AC_PREREQ([2.71])
 
 ###################
 # Required packages
@@ -20,12 +20,12 @@ m4_define([wx_required_version], [3.0.0])
 #######
 # Setup
 #######
-AC_INIT([Aegisub], [aegisub_version],, [aegisub])
+AC_INIT([Aegisub],[aegisub_version],[],[aegisub])
 : ${CFLAGS=""}
 : ${CXXFLAGS=""}
 AC_CONFIG_SRCDIR([src/main.cpp])
-AC_CONFIG_HEADER([acconf.h])
-AC_GNU_SOURCE
+AC_CONFIG_HEADERS([acconf.h])
+AC_USE_SYSTEM_EXTENSIONS
 AC_CANONICAL_HOST
 
 ###########################
@@ -123,7 +123,7 @@ AC_SUBST([BUILD_DATE])
 # Check for pthreads and setup variables / compiler
 ###################################################
 AS_IF([test x$build_darwin != xyes], [
-  ACX_PTHREAD([], [AC_MSG_FAILURE([You must have working pthreads.])])
+  AX_PTHREAD([],[AC_MSG_FAILURE([You must have working pthreads.])])
   CC="$PTHREAD_CC"
 ])
 
@@ -426,7 +426,7 @@ AS_IF([test x$with_system_luajit != xno], [
 ])
 
 AS_IF([test $with_system_luajit = no],
-      [AC_SUBST([LUAJIT_CFLAGS], ['-I$(TOP)vendor/luajit/include'])
+      [AC_SUBST([LUAJIT_CFLAGS], ['-I$(TOP)vendor/luajit/src'])
        AC_SUBST([LUAJIT_LIBS], ['$(TOP)vendor/luajit/src/libluajit.a'])])
 
 # We also need a Lua binary to run part of the build system
