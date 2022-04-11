@@ -232,7 +232,7 @@ void MatroskaWrapper::GetSubtitles(agi::fs::path const& filename, AssFile *targe
 		std::string priv((const char *)trackInfo->CodecPrivate, trackInfo->CodecPrivateSize);
 
 		// Load into file
-		boost::char_separator<char> sep("\r\n");
+		boost::char_separator<char> sep("\n");
 		for (auto const& cur : boost::tokenizer<boost::char_separator<char>>(priv, sep))
 			parser.AddLine(cur);
 	}

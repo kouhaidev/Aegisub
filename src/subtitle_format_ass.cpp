@@ -42,11 +42,7 @@ void AssSubtitleFormat::ReadFile(AssFile *target, agi::fs::path const& filename,
 		parser.AddLine(file.ReadLineFromFile());
 }
 
-#ifdef _WIN32
-#define LINEBREAK "\r\n"
-#else
 #define LINEBREAK "\n"
-#endif
 
 namespace {
 const char *format(AssEntryGroup group) {

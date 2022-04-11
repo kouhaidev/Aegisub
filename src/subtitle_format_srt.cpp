@@ -434,11 +434,7 @@ void SRTSubtitleFormat::WriteFile(const AssFile *src, agi::fs::path const& filen
 	StripComments(copy);
 	RecombineOverlaps(copy);
 	MergeIdentical(copy);
-#ifdef _WIN32
-	ConvertNewlines(copy, "\r\n", false);
-#else
 	ConvertNewlines(copy, "\n", false);
-#endif
 
 	// Write lines
 	int i=0;

@@ -48,7 +48,7 @@ std::string UUEncode(const char *begin, const char *end, bool insert_linebreaks)
 
 			if (insert_linebreaks && ++written == 80 && pos + 3 < size) {
 				written = 0;
-				ret += "\r\n";
+				ret += "\n";
 			}
 		}
 	}

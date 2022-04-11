@@ -35,7 +35,7 @@ public:
 	size_t GetSize() const;
 
 	/// Add a line of data (without newline) read from a subtitle file
-	void AddData(std::string const& data) { entry_data = entry_data.get() + data + "\r\n"; }
+	void AddData(std::string const& data) { entry_data = entry_data.get() + data + "\n"; }
 
 	/// Extract the contents of this attachment to a file
 	/// @param filename Path to save the attachment to

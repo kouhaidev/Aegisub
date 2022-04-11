@@ -26,7 +26,7 @@
 AssEntryGroup AssAttachment::Group() const { return group; }
 
 AssAttachment::AssAttachment(std::string const& header, AssEntryGroup group)
-: entry_data(header + "\r\n")
+: entry_data(header + "\n")
 , filename(header.substr(10))
 , group(group)
 {
@@ -43,7 +43,7 @@ AssAttachment::AssAttachment(agi::fs::path const& name, AssEntryGroup group)
 
 	agi::read_file_mapping file(name);
 	auto buff = file.read();
-	entry_data = (group == AssEntryGroup::FONT ? "fontname: " : "filename: ") + filename.get() + "\r\n";
+	entry_data = (group == AssEntryGroup::FONT ? "fontname: " : "filename: ") + filename.get() + "\n";
 	entry_data = entry_data.get() + agi::ass::UUEncode(buff, buff + file.size());
 }
 
