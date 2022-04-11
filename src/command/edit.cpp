@@ -119,7 +119,7 @@ void paste_lines(agi::Context *c, bool paste_over, Paster&& paste_line) {
 	AssDialogue *first = nullptr;
 	Selection newsel;
 
-	boost::char_separator<char> sep("\r\n");
+	boost::char_separator<char> sep("\n");
 	for (auto curdata : boost::tokenizer<boost::char_separator<char>>(data, sep)) {
 		AssDialogue *inserted = paste_line(get_dialogue(curdata));
 		if (!inserted)
@@ -820,7 +820,7 @@ static bool try_paste_lines(agi::Context *c) {
 	if (!boost::starts_with(data, "Dialogue:")) return false;
 
 	EntryList<AssDialogue> parsed;
-	boost::char_separator<char> sep("\r\n");
+	boost::char_separator<char> sep("\n");
 	for (auto curdata : boost::tokenizer<boost::char_separator<char>>(data, sep)) {
 		boost::trim(curdata);
 		try {
