@@ -548,10 +548,16 @@ struct edit_find_replace final : public Command {
 	}
 };
 
+#ifdef _WIN32
+#define LINEBREAK "\r\n"
+#else
+#define LINEBREAK "\n"
+#endif
+
 static void copy_lines(agi::Context *c) {
 	SetClipboard(join(c->selectionController->GetSortedSelection()
 		| transformed(static_cast<std::string(*)(AssDialogue*)>([](AssDialogue *d) { return d->GetEntryData(); })),
-		"\r\n"));
+		LINEBREAK));
 }
 
 static void delete_lines(agi::Context *c, wxString const& commit_message) {
