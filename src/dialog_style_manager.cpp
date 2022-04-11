@@ -553,6 +553,12 @@ void DialogStyleManager::OnCopyToCurrent() {
 	UpdateButtons();
 }
 
+#ifdef _WIN32
+#define LINEBREAK "\r\n"
+#else
+#define LINEBREAK "\n"
+#endif
+
 template<class T>
 void DialogStyleManager::CopyToClipboard(wxListBox *list, T const& v) {
 	wxArrayInt selections;
@@ -560,7 +566,7 @@ void DialogStyleManager::CopyToClipboard(wxListBox *list, T const& v) {
 
 	std::string data;
 	for(size_t i = 0; i < selections.size(); ++i) {
-		if (i) data += "\r\n";
+		if (i) data += LINEBREAK;
 		AssStyle *s = v[selections[i]];
 		s->UpdateData();
 		data += s->GetEntryData();
